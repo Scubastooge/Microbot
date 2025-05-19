@@ -1,21 +1,19 @@
-package net.runelite.client.plugins.microbot.example;
-
+package net.runelite.client.plugins.microbot.test;
 
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.example.ExamplePlugin;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
-
+import net.runelite.client.plugins.microbot.test.TestPlugin;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.awt.*;
 
-public class ExampleOverlay extends OverlayPanel {
-
+public class TestOverlay extends OverlayPanel {
     @Inject
-    ExampleOverlay(ExamplePlugin plugin)
+    TestOverlay(TestPlugin plugin)
     {
         super(plugin);
         setPosition(OverlayPosition.TOP_LEFT);
@@ -26,7 +24,7 @@ public class ExampleOverlay extends OverlayPanel {
         try {
             panelComponent.setPreferredSize(new Dimension(200, 300));
             panelComponent.getChildren().add(TitleComponent.builder()
-                    .text("Micro Example V1.0.0")
+                    .text("Micro Test V1.0.0")
                     .color(Color.GREEN)
                     .build());
 
