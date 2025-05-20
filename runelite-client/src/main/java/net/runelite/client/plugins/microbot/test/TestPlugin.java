@@ -44,12 +44,16 @@ public class TestPlugin extends Plugin {
     TestScript testScript;
 
     private Session session;
+    private WebsocketListener wl;
 
     @Override
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
             overlayManager.add(testOverlay);
         }
+
+        this.wl = new WebsocketListener(this);
+
         testScript.run(config);
 
         //Microbot.getClientThread().invoke(()->Microbot.startPlugin(Microbot.getPlugin(AutoLoginPlugin.class.getName())));
@@ -71,6 +75,11 @@ public class TestPlugin extends Plugin {
         //System.out.println(getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()));
 
 
+    }
+
+    public void handleWebSocketMessage(String string)
+    {
+        System.out.println(string);
     }
 
 

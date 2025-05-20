@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.example;
 
 import com.google.inject.Provides;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.WebSocketContainer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
@@ -12,6 +14,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.net.URI;
 
 @PluginDescriptor(
         name = PluginDescriptor.Default + "Example",
@@ -41,6 +44,13 @@ public class ExamplePlugin extends Plugin {
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
             overlayManager.add(exampleOverlay);
+        }
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            String uri = "ws://192.168.5.15:8765"; // Or your own WebSocket URL
+            container.connectToServer(this.getClass(), URI.create(uri));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         exampleScript.run(config);
     }
