@@ -16,7 +16,7 @@ public class TestScript extends Script {
     public boolean run(TestConfig config) {
         Microbot.enableAutoRunOn = false;
 
-
+        System.out.println("Script run thread: " + Thread.currentThread().getName());
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
@@ -24,6 +24,7 @@ public class TestScript extends Script {
                 if (!super.run()) return;
                 long startTime = System.currentTimeMillis();
 
+                System.out.println("Script thread: " + Thread.currentThread().getName());
 
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;

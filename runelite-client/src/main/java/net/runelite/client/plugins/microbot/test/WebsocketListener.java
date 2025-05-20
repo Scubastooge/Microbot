@@ -3,6 +3,8 @@ package net.runelite.client.plugins.microbot.test;
 import jakarta.websocket.*;
 
 import jakarta.websocket.Session;
+import net.runelite.client.plugins.microbot.Microbot;
+
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.*;
@@ -35,7 +37,8 @@ public class WebsocketListener {
 
     @OnMessage
     public void onMessage(String message) {
-        plugin.handleWebSocketMessage(message);
+        Microbot.getClientThread().invoke(() -> {plugin.handleWebSocketMessage(message);});
+        System.out.println("OnMessage thread: " + Thread.currentThread().getName());
     }
 
     @OnClose
@@ -48,5 +51,14 @@ public class WebsocketListener {
         throwable.printStackTrace();
     }
 
+    public void closeWebSocket() {
+        try {
+            System.out.println("Websocket Closing");
+            this.session.close();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
 }

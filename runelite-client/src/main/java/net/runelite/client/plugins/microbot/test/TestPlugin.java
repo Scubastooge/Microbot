@@ -9,6 +9,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountselector.AutoLoginPlugin;
+import net.runelite.client.plugins.microbot.zerozero.birdhunter.BirdHunterPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import jakarta.websocket.*;
@@ -55,31 +56,48 @@ public class TestPlugin extends Plugin {
         this.wl = new WebsocketListener(this);
 
         testScript.run(config);
-
+        System.out.println("Plugin startup thread: " + Thread.currentThread().getName());
         //Microbot.getClientThread().invoke(()->Microbot.startPlugin(Microbot.getPlugin(AutoLoginPlugin.class.getName())));
-
-
     }
 
     @Override
     protected void shutDown() {
+        wl.closeWebSocket();
         testScript.shutdown();
         overlayManager.remove(testOverlay);
-    }
 
+    }
 
     @Subscribe
     public void onGameTick(GameTick tick)
     {
-
         //System.out.println(getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()));
-
-
     }
 
     public void handleWebSocketMessage(String string)
     {
+        System.out.println("Handle websocket thread: " + Thread.currentThread().getName());
         System.out.println(string);
+        if (string.equals("stop")) {
+            this.stopPlugin();
+        }
+        if (string.equals("start")) {
+            this.startPlugin();
+        }
+    }
+
+    public void stopPlugin(){
+        Microbot.getClientThread().invoke(()->Microbot.stopPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName())));
+        //Microbot.stopPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
+    }
+
+    public void startPlugin(){
+        Microbot.getClientThread().runOnSeperateThread(()-> {
+            System.out.println("start plugin thread: " + Thread.currentThread().getName());
+            Microbot.startPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
+            return true;
+        });
+        //Microbot.startPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
     }
 
 
