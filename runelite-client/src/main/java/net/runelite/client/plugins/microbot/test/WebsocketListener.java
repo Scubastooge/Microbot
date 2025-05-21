@@ -4,6 +4,9 @@ import jakarta.websocket.*;
 
 import jakarta.websocket.Session;
 import net.runelite.client.plugins.microbot.Microbot;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.runelite.client.plugins.microbot.test.TestPlugin.jsonMessage;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -22,7 +25,7 @@ public class WebsocketListener {
         this.plugin = plugin;
         try {
             this.container = ContainerProvider.getWebSocketContainer();
-            this.container.connectToServer(this, new URI("ws://192.168.5.15:8765"));
+            this.container.connectToServer(this, new URI("ws://192.168.5.15:8001/ws/bot/wingedPlover1/"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -32,7 +35,15 @@ public class WebsocketListener {
     public void onOpen(Session session) {
         this.session = session;
         System.out.println("Connected!");
-        session.getAsyncRemote().sendText("Hello, WebSocket!\n");
+        ObjectMapper mapper = new ObjectMapper();
+        jsonMessage message = plugin.new jsonMessage("test");
+        try {
+            String json = mapper.writeValueAsString(message);
+            session.getAsyncRemote().sendText(json);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @OnMessage

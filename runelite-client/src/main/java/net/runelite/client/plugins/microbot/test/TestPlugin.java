@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.test;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -11,6 +12,8 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountselector.AutoLoginPlugin;
 import net.runelite.client.plugins.microbot.zerozero.birdhunter.BirdHunterPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+
 
 import jakarta.websocket.*;
 import java.net.URI;
@@ -100,5 +103,18 @@ public class TestPlugin extends Plugin {
         //Microbot.startPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
     }
 
+    public void quitClient(){
+
+    }
+
+    class jsonMessage{
+        public String message;
+
+        jsonMessage(String message){
+            this.message = message;
+        }
+
+
+    }
 
 }
