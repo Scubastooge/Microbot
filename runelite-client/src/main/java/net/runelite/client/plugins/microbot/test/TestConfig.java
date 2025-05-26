@@ -11,13 +11,19 @@ import java.util.List;
 @ConfigGroup("test")
 public interface TestConfig extends Config {
     @ConfigItem(
-        keyName = "Token",
-        name = "Token",
-        description = "Client Token",
+        keyName = "websocket",
+        name = "Websocket",
+        description = "address",
         position = 0
     )
-    default List<String> Token()
-    {
-        return Collections.singletonList("ABC123");
-    }
+    default String websocket() {return "ws://192.168.5.15:8001/ws/bot/wingedPlover1/";}
+
+    @ConfigItem(
+            keyName = "retrys",
+            name = "Retrys",
+            description = "Number of retrys before quitting",
+            position = 1
+    )
+    default int retrys(){return 5;}
 }
+

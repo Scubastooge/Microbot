@@ -21,11 +21,11 @@ public class WebsocketListener {
     private Session session;
     private WebSocketContainer container;
 
-    public WebsocketListener(TestPlugin plugin) {
+    public WebsocketListener(URI Address, TestPlugin plugin) {
         this.plugin = plugin;
         try {
             this.container = ContainerProvider.getWebSocketContainer();
-            this.container.connectToServer(this, new URI("ws://192.168.5.15:8001/ws/bot/wingedPlover1/"));
+            this.container.connectToServer(this, new URI(""));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +48,10 @@ public class WebsocketListener {
 
     @OnMessage
     public void onMessage(String message) {
-        Microbot.getClientThread().invoke(() -> {plugin.handleWebSocketMessage(message);});
+        Microbot.getClientThread().runOnSeperateThread(() -> {
+            plugin.handleWebSocketMessage(message, session);
+            return true;
+        });
         System.out.println("OnMessage thread: " + Thread.currentThread().getName());
     }
 
