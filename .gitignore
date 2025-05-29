@@ -11,3 +11,6 @@ project.properties
 .vscode
 .factorypath
 .DS_Store
+*.log
+/.run
+/.run

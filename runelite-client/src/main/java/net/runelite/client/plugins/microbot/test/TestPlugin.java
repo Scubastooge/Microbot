@@ -14,7 +14,11 @@ import net.runelite.client.plugins.microbot.accountselector.AutoLoginPlugin;
 import net.runelite.client.plugins.microbot.zerozero.birdhunter.BirdHunterPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,15 +59,31 @@ public class TestPlugin extends Plugin {
     private Session session;
     private WebsocketListener wl;
 
+    public static String getAccountName() {
+        Properties properties = new Properties();
+        try {
+            FileInputStream input = new FileInputStream(System.getProperty("user.home") + "/.runelite/credentials.properties");
+            properties.load(input);
+            return properties.getProperty("JX_DISPLAY_NAME");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     protected void startUp() throws AWTException {
+        System.out.println(this.getClass().toString());
         boolean socketSuccess = false;
         if (overlayManager != null) {
             overlayManager.add(testOverlay);
         }
         while(true) {
             try {
-                this.wl = new WebsocketListener(new URI(config.websocket()), this);
+                String username = getAccountName();
+                URI uri = new URI(String.format("%s/ws/bot/%s/", config.websocket(), username));
+
+                this.wl = new WebsocketListener(uri, this);
                 socketSuccess = true;
                 break;
             } catch (Exception e) {

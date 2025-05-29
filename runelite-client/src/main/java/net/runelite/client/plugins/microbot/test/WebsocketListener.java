@@ -21,11 +21,11 @@ public class WebsocketListener {
     private Session session;
     private WebSocketContainer container;
 
-    public WebsocketListener(URI Address, TestPlugin plugin) {
+    public WebsocketListener(URI address, TestPlugin plugin) {
         this.plugin = plugin;
         try {
             this.container = ContainerProvider.getWebSocketContainer();
-            this.container.connectToServer(this, new URI(""));
+            this.container.connectToServer(this, address);
         } catch (Exception e) {
             e.printStackTrace();
         }
