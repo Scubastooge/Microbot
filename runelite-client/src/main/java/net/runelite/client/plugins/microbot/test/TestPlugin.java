@@ -73,7 +73,7 @@ public class TestPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-        System.out.println(this.getClass().toString());
+        System.out.println(AutoLoginPlugin.class.getName());
         boolean socketSuccess = false;
         if (overlayManager != null) {
             overlayManager.add(testOverlay);
@@ -150,6 +150,7 @@ public class TestPlugin extends Plugin {
     }
 
     public void startPlugin(Map<String, Object> messageMap){
+        System.out.println(messageMap.get("data").toString());
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean result = new AtomicBoolean(false);
         Microbot.getClientThread().runOnSeperateThread(()-> {
