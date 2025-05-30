@@ -200,6 +200,7 @@ public class TestPlugin extends Plugin {
 
     public void quitClient(){
         System.exit(0);
+        //test
     }
 
     public void configPlugin(Map<String, Object> messageMap)
