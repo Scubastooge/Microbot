@@ -9,7 +9,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.microbot.MicrobotApi;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -44,6 +43,7 @@ public class ExamplePlugin extends Plugin {
     protected void startUp() throws AWTException {
         if (overlayManager != null) {
             overlayManager.add(exampleOverlay);
+            exampleOverlay.myButton.hookMouseListener();
         }
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -58,6 +58,7 @@ public class ExamplePlugin extends Plugin {
     protected void shutDown() {
         exampleScript.shutdown();
         overlayManager.remove(exampleOverlay);
+        exampleOverlay.myButton.unhookMouseListener();
     }
     int ticks = 10;
     @Subscribe
