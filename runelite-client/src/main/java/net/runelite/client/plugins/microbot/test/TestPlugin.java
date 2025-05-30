@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.test;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.NpcID;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.RuneLite;
 import net.runelite.client.config.ConfigManager;
@@ -11,6 +12,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountselector.AutoLoginPlugin;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.zerozero.birdhunter.BirdHunterPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -147,6 +150,9 @@ public class TestPlugin extends Plugin {
                 case "configure":
                     this.configPlugin(messageMap);
                     break;
+                case "walk":
+                    this.walkTo();
+                    break;
             }
         }
         catch (Exception e){e.printStackTrace();}
@@ -169,6 +175,10 @@ public class TestPlugin extends Plugin {
             }
             //Microbot.stopPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
         }
+    }
+    public void walkTo()
+    {
+        Rs2Walker.walkTo(Rs2Npc.getNpc("Bob").getWorldLocation());
     }
 
     public void startPlugin(Map<String, Object> messageMap){
