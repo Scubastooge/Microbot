@@ -52,7 +52,6 @@ public class WebsocketListener {
             plugin.handleWebSocketMessage(message, session);
             return true;
         });
-        System.out.println("OnMessage thread: " + Thread.currentThread().getName());
     }
 
     @OnClose

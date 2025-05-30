@@ -15,11 +15,13 @@ import net.runelite.client.plugins.microbot.zerozero.birdhunter.BirdHunterPlugin
 import net.runelite.client.ui.overlay.OverlayManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -28,6 +30,7 @@ import jakarta.websocket.*;
 import java.net.URI;
 
 import javax.inject.Inject;
+import javax.swing.*;
 import java.awt.*;
 
 
@@ -47,6 +50,7 @@ public class TestPlugin extends Plugin {
     TestConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(TestConfig.class);
     }
+    private boolean start;
 
     @Inject
     private OverlayManager overlayManager;
@@ -73,22 +77,20 @@ public class TestPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
+        this.start = false;
         System.out.println(AutoLoginPlugin.class.getName());
         boolean socketSuccess = false;
         if (overlayManager != null) {
             overlayManager.add(testOverlay);
         }
-        while(true) {
-            try {
-                String username = getAccountName();
-                URI uri = new URI(String.format("%s/ws/bot/%s/", config.websocket(), username));
+        try {
+            String username = getAccountName();
+            URI uri = new URI(String.format("%s/ws/bot/%s/", config.websocket(), username));
 
-                this.wl = new WebsocketListener(uri, this);
-                socketSuccess = true;
-                break;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            this.wl = new WebsocketListener(uri, this);
+            socketSuccess = true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (!socketSuccess)
         {
@@ -110,7 +112,16 @@ public class TestPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick tick)
     {
-        //System.out.println(getName().chars().mapToObj(i -> (char)(i + 3)).map(String::valueOf).collect(Collectors.joining()));
+        /*if (this.start) {
+            Microbot.getClientThread().invokeLater(() -> {
+                System.out.println("microbot startplugin thread: " + Thread.currentThread().getName());
+                System.out.println("microbot EDT: " + SwingUtilities.isEventDispatchThread());
+                Microbot.startPlugin(this.plugin);
+                //result.set(!Microbot.getPluginManager().isPluginEnabled(Microbot.getPlugin(messageMap.get("data").toString())));
+                //return true;
+            });
+            this.start = false;
+        }*/
     }
 
     public void handleWebSocketMessage(String string, Session session)
@@ -124,48 +135,60 @@ public class TestPlugin extends Plugin {
             switch (messageMap.get("command").toString()){
                 case "stop":
                     this.stopPlugin(messageMap);
+                    break;
                 case "start":
                     this.startPlugin(messageMap);
+                    break;
                 case "quit":
                     this.quitClient();
+                    break;
             }
         }
         catch (Exception e){e.printStackTrace();}
     }
 
     public void stopPlugin(Map<String, Object> messageMap){
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicBoolean result = new AtomicBoolean(false);
-        Microbot.getClientThread().invoke(()->{
-            Microbot.stopPlugin(Microbot.getPlugin(messageMap.get("data").toString()));
-            result.set(!Microbot.getPluginManager().isPluginEnabled(Microbot.getPlugin(messageMap.get("data").toString())));
-            latch.countDown();
-        });
-        try {
-            latch.await();
-            this.session.getAsyncRemote().sendText("{\"result\": \""+result.toString()+"\"}");
+        System.out.println(messageMap.get("data").toString());
+        Plugin plugin = Microbot.getPlugin(messageMap.get("data").toString());
+        if (plugin == null) {
+            System.out.println("Plugin was null");
         }
-        catch (Exception e){e.printStackTrace();}
-        //Microbot.stopPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
+        else {
+            Microbot.stopPlugin(plugin);
+            try {
+                Thread.sleep(100);
+                boolean result = (!Microbot.isPluginEnabled(plugin.getClass()));
+                this.session.getAsyncRemote().sendText("{\"message\": \"" + result + "\"}");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //Microbot.stopPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
+        }
     }
 
     public void startPlugin(Map<String, Object> messageMap){
         System.out.println(messageMap.get("data").toString());
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicBoolean result = new AtomicBoolean(false);
-        Microbot.getClientThread().runOnSeperateThread(()-> {
-            System.out.println("start plugin thread: " + Thread.currentThread().getName());
-            Microbot.startPlugin(Microbot.getPlugin(messageMap.get("data").toString()));
-            result.set(!Microbot.getPluginManager().isPluginEnabled(Microbot.getPlugin(messageMap.get("data").toString())));
-            latch.countDown();
-            return true;
-        });
-        try {
-            latch.await();
-            this.session.getAsyncRemote().sendText("{\"result\": \""+result.toString()+"\"}");
+        Plugin plugin = Microbot.getPlugin(messageMap.get("data").toString());
+        if (plugin == null) {
+            System.out.println("Plugin was null");
         }
-        catch (Exception e){e.printStackTrace();}
+        else {
+            try {
+                Microbot.startPlugin(plugin);
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+
+            try {
+                Thread.sleep(100);
+                boolean result = Microbot.isPluginEnabled(plugin.getClass());
+                this.session.getAsyncRemote().sendText("{\"message\": \"" + result + "\"}");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         //Microbot.startPlugin(Microbot.getPlugin(BirdHunterPlugin.class.getName()));
+
     }
 
     public void quitClient(){
