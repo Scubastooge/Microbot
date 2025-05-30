@@ -16,8 +16,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -31,7 +33,7 @@ import java.net.URI;
 
 import javax.inject.Inject;
 import javax.swing.*;
-import java.awt.*;
+//import java.awt.*;
 
 
 
@@ -142,6 +144,9 @@ public class TestPlugin extends Plugin {
                 case "quit":
                     this.quitClient();
                     break;
+                case "configure":
+                    this.configPlugin(messageMap);
+                    break;
             }
         }
         catch (Exception e){e.printStackTrace();}
@@ -169,6 +174,7 @@ public class TestPlugin extends Plugin {
     public void startPlugin(Map<String, Object> messageMap){
         System.out.println(messageMap.get("data").toString());
         Plugin plugin = Microbot.getPlugin(messageMap.get("data").toString());
+
         if (plugin == null) {
             System.out.println("Plugin was null");
         }
@@ -177,6 +183,7 @@ public class TestPlugin extends Plugin {
                 Microbot.startPlugin(plugin);
             } catch (Exception e) {
                 //e.printStackTrace();
+                //Hiding the EDT error.. Seems meaningless
             }
 
             try {
@@ -194,6 +201,17 @@ public class TestPlugin extends Plugin {
     public void quitClient(){
         System.exit(0);
     }
+
+    public void configPlugin(Map<String, Object> messageMap)
+    {
+        Object configsObj = messageMap.get("configs");
+        java.util.List<Map<String, Object>> configs = (java.util.List<Map<String, Object>>) configsObj;
+        for (Map<String, Object> config : configs) {
+            //if (config.get("valueType").toString())
+            Microbot.getConfigManager().setConfiguration(config.get("configGroup").toString(), config.get("itemKey").toString(), config.get("itemValue"));
+        }
+    }
+
 
     class jsonMessage{
         public String message;
